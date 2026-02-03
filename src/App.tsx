@@ -70,10 +70,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                         {isHome && (
                             <div>
                                 <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Hola,</p>
-                                <h1 className="text-xl font-bold text-slate-800 leading-none">{profile.name || 'DiaBuddy'}</h1>
+                                <h1 className="text-xl font-bold text-slate-800 leading-none">{profile.name || 'GlucAmigo'}</h1>
                             </div>
                         )}
-                        {!isHome && <h1 className="text-lg font-bold text-slate-700">DiaBuddy</h1>}
+                        {!isHome && <h1 className="text-lg font-bold text-slate-700">GlucAmigo</h1>}
                     </motion.div>
 
                     <div className="flex items-center gap-2">

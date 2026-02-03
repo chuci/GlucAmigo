@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'DiaBuddy - Asistente Diabetes Tipo 1',
-        short_name: 'DiaBuddy',
+        name: 'GlucAmigo - Asistente Diabetes Tipo 1',
+        short_name: 'GlucAmigo',
         description: 'Asistente inteligente para la gestión de diabetes pediátrica',
         theme_color: '#ffffff',
         icons: [
