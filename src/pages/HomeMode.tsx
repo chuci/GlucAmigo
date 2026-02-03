@@ -1,5 +1,5 @@
 import React from 'react';
-import { Utensils, Bike, Flame, ArrowRight, Activity, Droplet } from 'lucide-react';
+import { Utensils, Bike, Flame, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -26,24 +26,6 @@ export const HomeMode: React.FC = () => {
             animate="show"
             className="space-y-6 mt-4"
         >
-            {/* Quick Stats Widget (Mockup for Visuals) */}
-            <motion.div variants={item} className="grid grid-cols-2 gap-4 mb-6">
-                <div className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center text-center">
-                    <div className="bg-indigo-50 p-2 rounded-full mb-2">
-                        <Activity className="h-5 w-5 text-indigo-500" />
-                    </div>
-                    <span className="text-2xl font-bold text-slate-700">105</span>
-                    <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">Media (mg/dL)</span>
-                </div>
-                <div className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center text-center">
-                    <div className="bg-blue-50 p-2 rounded-full mb-2">
-                        <Droplet className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <span className="text-2xl font-bold text-slate-700">0.5u</span>
-                    <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">IOB Activa</span>
-                </div>
-            </motion.div>
-
             <motion.div variants={item} className="text-left mb-6 px-2">
                 <h2 className="text-lg font-bold text-slate-800">¿Qué necesitas ahora?</h2>
             </motion.div>
