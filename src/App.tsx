@@ -10,6 +10,7 @@ import { EatingMode } from './pages/EatingMode';
 import { SportsMode } from './pages/SportsMode';
 import { CrisisMode } from './pages/CrisisMode';
 import { SettingsMode } from './pages/SettingsMode';
+import { initAuth } from './services/firebase';
 
 const DisclaimerScreen = ({ onAccept }: { onAccept: () => void }) => (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden">
@@ -114,25 +115,33 @@ const AnimatedRoutes = () => {
         <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
                 <Route path="/" element={
-                    <PageTransition>
-                        <HomeMode />
-                    </PageTransition>
+                    <ProtectedRoute>
+                        <PageTransition>
+                            <HomeMode />
+                        </PageTransition>
+                    </ProtectedRoute>
                 } />
                 <Route path="/eat" element={
-                    <PageTransition>
-                        <EatingMode onBack={() => { }} onSettings={() => { }} />
-                        {/* Note: EatingMode handles internal navigation, onBack override handled by Layout logic usually but props kept for types */}
-                    </PageTransition>
+                    <ProtectedRoute>
+                        <PageTransition>
+                            <EatingMode onBack={() => { }} onSettings={() => { }} />
+                            {/* Note: EatingMode handles internal navigation, onBack override handled by Layout logic usually but props kept for types */}
+                        </PageTransition>
+                    </ProtectedRoute>
                 } />
                 <Route path="/sport" element={
-                    <PageTransition>
-                        <SportsMode />
-                    </PageTransition>
+                    <ProtectedRoute>
+                        <PageTransition>
+                            <SportsMode />
+                        </PageTransition>
+                    </ProtectedRoute>
                 } />
                 <Route path="/crisis" element={
-                    <PageTransition>
-                        <CrisisMode />
-                    </PageTransition>
+                    <ProtectedRoute>
+                        <PageTransition>
+                            <CrisisMode />
+                        </PageTransition>
+                    </ProtectedRoute>
                 } />
                 <Route path="/settings" element={
                     <PageTransition>
@@ -165,6 +174,10 @@ const AppRoutes = () => {
 
 const App = () => {
     const [accepted, setAccepted] = useDisclaimer();
+
+    React.useEffect(() => {
+        initAuth();
+    }, []);
 
     if (!accepted) {
         return <DisclaimerScreen onAccept={() => setAccepted(true)} />;

@@ -11,7 +11,12 @@ export const SportsMode: React.FC = () => {
         if (isNaN(g)) return null;
 
         if (g < 100) return { status: 'stop', color: 'red', msg: 'STOP ✋. Come 1-2 raciones de HC lentos (galleta, pan) y espera a subir de 100 antes de empezar.', icon: AlertTriangle };
-        if (g >= 100 && g <= 250) return { status: 'go', color: 'green', msg: 'ADELANTE 🟢. Rango óptimo. Si vas a hacer más de 1h, mide a la mitad.', icon: CheckCircle };
+
+        // New range: 100 - 120 (Optimal but close to limit)
+        if (g >= 100 && g < 120) return { status: 'monitor', color: 'indigo', msg: 'OJO 🧐. Estás en rango pero algo justo. Si el entreno es largo, come una fruta o monitoriza cada 20 min.', icon: AlertCircle };
+
+        if (g >= 120 && g <= 250) return { status: 'go', color: 'green', msg: 'ADELANTE 🟢. Rango óptimo para entrenar. ¡Disfruta!', icon: CheckCircle };
+
         if (g > 250) return { status: 'caution', color: 'orange', msg: 'PRECAUCIÓN ⚠️. Mide Cetonas. Si hay cetonas NO hagas deporte. Si no hay, bebe agua y corrige.', icon: AlertCircle };
         return null;
     };
@@ -44,13 +49,14 @@ export const SportsMode: React.FC = () => {
                             exit={{ opacity: 0, scale: 0.9, height: 0 }}
                             transition={{ type: "spring", bounce: 0.4 }}
                             className={`mt-6 p-6 rounded-2xl border-2 shadow-sm ${sportResult.status === 'go' ? 'bg-green-50 border-green-200 text-green-900' :
+                                sportResult.status === 'monitor' ? 'bg-indigo-50 border-indigo-200 text-indigo-900' :
                                     sportResult.status === 'caution' ? 'bg-orange-50 border-orange-200 text-orange-900' :
                                         'bg-red-50 border-red-200 text-red-900'
                                 }`}
                         >
                             <div className="flex items-center mb-2">
-                                <sportResult.icon className={`h-6 w-6 mr-2 ${sportResult.status === 'go' ? 'text-green-600' : sportResult.status === 'caution' ? 'text-orange-600' : 'text-red-600'}`} />
-                                <p className="font-bold text-lg">{sportResult.status === 'go' ? '¡ADELANTE!' : sportResult.status === 'caution' ? 'PRECAUCIÓN' : 'STOP'}</p>
+                                <sportResult.icon className={`h-6 w-6 mr-2 ${sportResult.status === 'go' ? 'text-green-600' : sportResult.status === 'monitor' ? 'text-indigo-600' : sportResult.status === 'caution' ? 'text-orange-600' : 'text-red-600'}`} />
+                                <p className="font-bold text-lg">{sportResult.status === 'go' ? '¡ADELANTE!' : sportResult.status === 'monitor' ? 'VIGILA' : sportResult.status === 'caution' ? 'PRECAUCIÓN' : 'STOP'}</p>
                             </div>
                             <p className="text-sm leading-relaxed font-medium opacity-90">{sportResult.msg}</p>
                         </motion.div>

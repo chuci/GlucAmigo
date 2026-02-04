@@ -1,7 +1,8 @@
 import React from 'react';
-import { Utensils, Bike, Flame, ArrowRight } from 'lucide-react';
+import { Utensils, Bike, Flame, ArrowRight, Activity, Droplet } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useLogs } from '../services/storage';
 
 const container = {
     hidden: { opacity: 0 },
@@ -19,6 +20,34 @@ const item = {
 };
 
 export const HomeMode: React.FC = () => {
+    const [logs] = useLogs();
+
+    // Calculate Average Glucose (Last 30 entries)
+    const glucoseReadings = logs.filter(l => l.glucose > 0).slice(0, 30);
+    const avgGlucose = glucoseReadings.length > 0
+        ? Math.round(glucoseReadings.reduce((acc, curr) => acc + curr.glucose, 0) / glucoseReadings.length)
+        : 0;
+
+    // Calculate IOB (Insulin on Board) - Simple Linear Decay (4 hours)
+    const calculateIOB = () => {
+        const now = new Date().getTime();
+        let totalIOB = 0;
+        const duration = 4 * 60 * 60 * 1000; // 4 hours in ms
+
+        logs.forEach(log => {
+            const logTime = new Date(log.timestamp).getTime();
+            const timeElapsed = now - logTime;
+
+            if (timeElapsed < duration && log.insulin.total > 0) {
+                const percentRemaining = 1 - (timeElapsed / duration);
+                totalIOB += log.insulin.total * percentRemaining;
+            }
+        });
+        return Math.max(0, totalIOB);
+    };
+
+    const iob = calculateIOB();
+
     return (
         <motion.div
             variants={container}
@@ -26,6 +55,24 @@ export const HomeMode: React.FC = () => {
             animate="show"
             className="space-y-6 mt-4"
         >
+            {/* Quick Stats Widget (Real Data) */}
+            <motion.div variants={item} className="grid grid-cols-2 gap-4 mb-6">
+                <div className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center text-center">
+                    <div className="bg-indigo-50 p-2 rounded-full mb-2">
+                        <Activity className="h-5 w-5 text-indigo-500" />
+                    </div>
+                    <span className="text-2xl font-bold text-slate-700">{avgGlucose > 0 ? avgGlucose : '--'}</span>
+                    <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">Media (mg/dL)</span>
+                </div>
+                <div className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center text-center">
+                    <div className="bg-blue-50 p-2 rounded-full mb-2">
+                        <Droplet className="h-5 w-5 text-blue-500" />
+                    </div>
+                    <span className="text-2xl font-bold text-slate-700">{iob > 0 ? iob.toFixed(1) + 'u' : '--'}</span>
+                    <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">IOB Activa</span>
+                </div>
+            </motion.div>
+
             <motion.div variants={item} className="text-left mb-6 px-2">
                 <h2 className="text-lg font-bold text-slate-800">¿Qué necesitas ahora?</h2>
             </motion.div>
@@ -84,6 +131,6 @@ export const HomeMode: React.FC = () => {
                 </Link>
             </motion.div>
 
-        </motion.div>
+        </motion.div >
     );
 };

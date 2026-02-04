@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Save, ChevronLeft, Heart, ToggleLeft, Info, X } from 'lucide-react';
 import { useProfile } from '../services/storage';
+import { saveProfileToCloud } from '../services/firebase';
 import { InputField } from '../components/InputField';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,6 +16,7 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
     // Initial state allows string inputs for better UX
     const [localProfile, setLocalProfile] = useState<{
         name: string;
+        cloudConsent: boolean;
         ratios: {
             [key: string]: {
                 carbRatio: string | number;
@@ -24,6 +26,7 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
         }
     }>({
         name: profile.name,
+        cloudConsent: profile.cloudConsent || false,
         ratios: {
             breakfast: { ...profile.ratios.breakfast },
             lunch: { ...profile.ratios.lunch },
@@ -43,7 +46,22 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
                 target: parseFloat(String(localProfile.ratios[m].target)) || 0,
             };
         });
-        setProfile({ ...profile, name: localProfile.name, ratios: cleanRatios });
+
+        const newProfile = {
+            ...profile,
+            name: localProfile.name,
+            ratios: cleanRatios,
+            isConfigured: true,
+            cloudConsent: localProfile.cloudConsent
+        };
+
+        setProfile(newProfile);
+
+        // Only sync to cloud if consent is given
+        if (newProfile.cloudConsent) {
+            saveProfileToCloud(newProfile); // ☁️ Sync to Firebase
+        }
+
         onBack();
     };
 
@@ -106,7 +124,33 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
                     </div>
                 ))}
 
-                <button type="submit" className="w-full mt-6 bg-indigo-600 text-white py-3 rounded-xl font-bold flex items-center justify-center hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">
+                <div className="bg-indigo-50 p-4 rounded-xl mb-6 border border-indigo-100">
+                    <h3 className="font-bold text-indigo-900 mb-2 flex items-center">
+                        <Info className="h-5 w-5 mr-2" /> Privacidad y Estudios
+                    </h3>
+                    <p className="text-xs text-indigo-800 mb-4 leading-relaxed">
+                        Colabora con la ciencia permitiendo el uso anónimo de tus datos (glucosa, insulina y comidas) para estudios estadísticos universitarios.
+                        <br /><br />
+                        <strong>Si no aceptas, tus datos SOLO se guardarán en este dispositivo.</strong>
+                    </p>
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                        <div className="relative">
+                            <input
+                                type="checkbox"
+                                className="sr-only"
+                                checked={localProfile.cloudConsent}
+                                onChange={(e) => setLocalProfile(prev => ({ ...prev, cloudConsent: e.target.checked }))}
+                            />
+                            <div className={`block w-14 h-8 rounded-full transition-colors ${localProfile.cloudConsent ? 'bg-indigo-600' : 'bg-slate-300'}`}></div>
+                            <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${localProfile.cloudConsent ? 'transform translate-x-6' : ''}`}></div>
+                        </div>
+                        <span className="text-sm font-bold text-slate-700">
+                            {localProfile.cloudConsent ? 'Sí, acepto contribuir' : 'No, mantener privado'}
+                        </span>
+                    </label>
+                </div>
+
+                <button type="submit" className="w-full mt-2 bg-indigo-600 text-white py-3 rounded-xl font-bold flex items-center justify-center hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">
                     <Save className="h-5 w-5 mr-2" /> Guardar Todo
                 </button>
             </form>

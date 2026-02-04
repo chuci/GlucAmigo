@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, Apple, Activity, AlertTriangle, Save, ChevronLeft, Search, Utensils, PlusCircle, Trash2, TrendingUp, TrendingDown, ArrowRight, Sun, Moon, Coffee, Star, BookOpen, GraduationCap, CheckCircle, XCircle, Calculator, ChevronsUp, ChevronsDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useProfile, useSavedMenus, useFoodDatabase } from '../services/storage';
+import { useProfile, useSavedMenus, useFoodDatabase, useLogs } from '../services/storage';
+import { saveLogToCloud } from '../services/firebase';
 import { calculateBolus } from '../logic/bolus';
 import { FOOD_DATABASE } from '../data/foodDatabase';
 import { InputField } from '../components/InputField';
@@ -34,6 +35,7 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
     // Storage Hooks
     const [profile] = useProfile();
     const [savedMenus, setSavedMenus] = useSavedMenus();
+    const [logs, setLogs] = useLogs();
 
     useEffect(() => {
         const hour = new Date().getHours();
@@ -379,6 +381,43 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                                         <div className="font-bold text-slate-800 uppercase text-xs">Total Rápida</div>
                                         <div className="font-black text-xl text-slate-900">{insulinResult.totalDose.toFixed(1)} u</div>
                                     </div>
+
+                                    <button
+                                        onClick={() => {
+                                            const newLog = {
+                                                id: Date.now(),
+                                                timestamp: new Date().toISOString(),
+                                                glucose: parseFloat(glucose) || 0,
+                                                carbs: parseFloat(carbsInput) || 0,
+                                                foods: addedFoods.map(f => f.name),
+                                                insulin: {
+                                                    total: insulinResult.totalDose,
+                                                    food: insulinResult.foodDose,
+                                                    correction: insulinResult.correctionDose
+                                                },
+                                                notes: feedback?.status === 'correct' ? 'Cálculo aceptado' : 'Cálculo revisado'
+                                            };
+                                            setLogs([newLog, ...logs]);
+
+                                            // ☁️ Sync to Firebase ONLY if consent is given
+                                            if (profile.cloudConsent) {
+                                                saveLogToCloud(newLog);
+                                                alert('¡Guardado en historial y nube!');
+                                            } else {
+                                                alert('¡Guardado en historial local!');
+                                            }
+
+                                            setShowResult(false);
+                                            setAddedFoods([]);
+                                            setCarbsInput('');
+                                            setGlucose('');
+                                            setProposedDose('');
+                                            setView('calculator');
+                                        }}
+                                        className="w-full mt-4 bg-slate-900 text-white py-3 rounded-xl font-bold flex items-center justify-center hover:bg-slate-800 transition"
+                                    >
+                                        <Save className="h-4 w-4 mr-2" /> Guardar en Historial
+                                    </button>
                                 </div>
                             </motion.div>
                         )}
