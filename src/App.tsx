@@ -93,7 +93,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                             <motion.button
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
-                                onClick={() => navigate('/settings')}
+                                onClick={() => navigate('/settings', { state: { from: location.pathname } })}
                                 className="p-2 bg-white/50 rounded-full text-slate-400 hover:bg-white hover:text-indigo-600 transition-all"
                             >
                                 <Settings className="h-6 w-6" />

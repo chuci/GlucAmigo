@@ -18,11 +18,12 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
     const from = (location.state as any)?.from || '/';
 
     const handleBack = () => {
+        // Prioritize returning to the specific route we came from
         if ((location.state as any)?.from) {
             navigate((location.state as any).from);
         } else {
-            onBack(); // Fallback to prop or Home
-            if (!onBack.name) navigate('/');
+            // Default fallback
+            navigate('/');
         }
     };
     const [profile, setProfile] = useProfile();
