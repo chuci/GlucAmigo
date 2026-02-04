@@ -5,11 +5,26 @@ import { saveProfileToCloud } from '../services/firebase';
 import { InputField } from '../components/InputField';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { useNavigate, useLocation } from 'react-router-dom';
+
 interface SettingsModeProps {
     onBack: () => void;
 }
 
 export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    // Check if we have history state to go back to, otherwise default to home (handled by onBack if passed, or explicit nav)
+    const from = (location.state as any)?.from || '/';
+
+    const handleBack = () => {
+        if ((location.state as any)?.from) {
+            navigate((location.state as any).from);
+        } else {
+            onBack(); // Fallback to prop or Home
+            if (!onBack.name) navigate('/');
+        }
+    };
     const [profile, setProfile] = useProfile();
     const [activeHelp, setActiveHelp] = useState<string | null>(null);
 
@@ -62,7 +77,7 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
             saveProfileToCloud(newProfile); // ☁️ Sync to Firebase
         }
 
-        onBack();
+        handleBack();
     };
 
     const updateProfileRatio = (meal: string, field: string, value: string) => {
@@ -84,7 +99,7 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="bg-white rounded-2xl shadow-md p-6 pt-8 pb-20 relative">
             <div className="flex items-center mb-4">
-                <button onClick={onBack} className="mr-3 p-1 rounded-full hover:bg-slate-100">
+                <button onClick={handleBack} className="mr-3 p-1 rounded-full hover:bg-slate-100">
                     <ChevronLeft className="h-6 w-6 text-slate-500" />
                 </button>
                 <h2 className="text-lg font-bold text-slate-800">Configuración</h2>
@@ -124,31 +139,14 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
                     </div>
                 ))}
 
+                {/* Privacy Section Hidden for Store Compliance
                 <div className="bg-indigo-50 p-4 rounded-xl mb-6 border border-indigo-100">
                     <h3 className="font-bold text-indigo-900 mb-2 flex items-center">
                         <Info className="h-5 w-5 mr-2" /> Privacidad y Estudios
                     </h3>
-                    <p className="text-xs text-indigo-800 mb-4 leading-relaxed">
-                        Colabora con la ciencia permitiendo el uso anónimo de tus datos (glucosa, insulina y comidas) para estudios estadísticos universitarios.
-                        <br /><br />
-                        <strong>Si no aceptas, tus datos SOLO se guardarán en este dispositivo.</strong>
-                    </p>
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                        <div className="relative">
-                            <input
-                                type="checkbox"
-                                className="sr-only"
-                                checked={localProfile.cloudConsent}
-                                onChange={(e) => setLocalProfile(prev => ({ ...prev, cloudConsent: e.target.checked }))}
-                            />
-                            <div className={`block w-14 h-8 rounded-full transition-colors ${localProfile.cloudConsent ? 'bg-indigo-600' : 'bg-slate-300'}`}></div>
-                            <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${localProfile.cloudConsent ? 'transform translate-x-6' : ''}`}></div>
-                        </div>
-                        <span className="text-sm font-bold text-slate-700">
-                            {localProfile.cloudConsent ? 'Sí, acepto contribuir' : 'No, mantener privado'}
-                        </span>
-                    </label>
+                    ...
                 </div>
+                */}
 
                 <button type="submit" className="w-full mt-2 bg-indigo-600 text-white py-3 rounded-xl font-bold flex items-center justify-center hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">
                     <Save className="h-5 w-5 mr-2" /> Guardar Todo

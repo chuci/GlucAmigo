@@ -109,6 +109,19 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
+// Wrapper to handle navigation for EatingMode
+const EatingModeWithNav = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    return (
+        <EatingMode
+            onBack={() => navigate('/')}
+            onSettings={() => navigate('/settings', { state: { from: location.pathname } })}
+        />
+    );
+};
+
 const AnimatedRoutes = () => {
     const location = useLocation();
     return (
@@ -124,8 +137,8 @@ const AnimatedRoutes = () => {
                 <Route path="/eat" element={
                     <ProtectedRoute>
                         <PageTransition>
-                            <EatingMode onBack={() => { }} onSettings={() => { }} />
-                            {/* Note: EatingMode handles internal navigation, onBack override handled by Layout logic usually but props kept for types */}
+                            {/* Pass navigation handlers to EatingMode */}
+                            <EatingModeWithNav />
                         </PageTransition>
                     </ProtectedRoute>
                 } />
@@ -145,6 +158,7 @@ const AnimatedRoutes = () => {
                 } />
                 <Route path="/settings" element={
                     <PageTransition>
+                        {/* We pass a dummy onBack because now SettingsMode handles navigation with useLocation hook internally */}
                         <SettingsMode onBack={() => { }} />
                     </PageTransition>
                 } />

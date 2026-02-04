@@ -11,12 +11,14 @@ export interface FoodItem {
 export const FOOD_DATABASE: FoodItem[] = [
     // --- LÁCTEOS (IG Bajo/Medio) ---
     { id: 101, name: 'Leche entera/semi/desnatada', carbs: 5, unit: 'g HC por 100ml', absorption: 'media', category: 'Lacteos' },
-    { id: 102, name: 'Yogur natural/sabores', carbs: 14, unit: 'g HC por 125g (1 unidad)', absorption: 'media', category: 'Lacteos' }, // aprox 4-5g/100g -> 125g = ~6g (natural) a 15g (sabor)
+    { id: 102, name: 'Yogur Natural (Sin azúcar)', carbs: 5, unit: 'g HC por 125g (1 unidad)', absorption: 'media', category: 'Lacteos' },
+    { id: 110, name: 'Yogur Sabores / Edulcorado', carbs: 14, unit: 'g HC por 125g (1 unidad)', absorption: 'rapida', category: 'Lacteos' },
     { id: 103, name: 'Yogur líquido', carbs: 11, unit: 'g HC por 100ml', absorption: 'rapida', category: 'Lacteos' },
     { id: 104, name: 'Cuajada', carbs: 10, unit: 'g HC por 1 unidad', absorption: 'media', category: 'Lacteos' },
     { id: 105, name: 'Kéfir', carbs: 5, unit: 'g HC por 100g', absorption: 'media', category: 'Lacteos' },
 
     // --- CEREALES, TUBÉRCULOS Y HARINAS ---
+    { id: 220, name: 'Tapioca / Yuca (Cocida)', carbs: 38, unit: 'g HC por 100g', absorption: 'media', category: 'Cereales' }, // High carb
     { id: 201, name: 'Pan Blanco (Barra)', carbs: 55, unit: 'g HC por 100g', absorption: 'rapida', category: 'Cereales' },
     { id: 202, name: 'Pan Integral', carbs: 45, unit: 'g HC por 100g', absorption: 'media', category: 'Cereales' },
     { id: 203, name: 'Pan de Molde Blanco', carbs: 48, unit: 'g HC por 100g', absorption: 'rapida', category: 'Cereales' },
@@ -24,6 +26,12 @@ export const FOOD_DATABASE: FoodItem[] = [
     { id: 205, name: 'Arroz Blanco (Cocido)', carbs: 28, unit: 'g HC por 100g', absorption: 'rapida', category: 'Cereales' },
     { id: 206, name: 'Arroz Integral (Cocido)', carbs: 26, unit: 'g HC por 100g', absorption: 'media', category: 'Cereales' },
     { id: 207, name: 'Pasta (Cocida)', carbs: 25, unit: 'g HC por 100g', absorption: 'media', category: 'Cereales' }, // Al dente es lenta/media
+    { id: 221, name: 'Pasta Sopa/Maravilla (Seca)', carbs: 72, unit: 'g HC por 100g', absorption: 'rapida', category: 'Cereales' }, // Se pesa en seco
+    { id: 222, name: 'Cuscús (Cocido)', carbs: 23, unit: 'g HC por 100g', absorption: 'media', category: 'Cereales' },
+    { id: 223, name: 'Quinoa (Cocida)', carbs: 21, unit: 'g HC por 100g', absorption: 'media', category: 'Cereales' },
+    { id: 224, name: 'Harina de Trigo', carbs: 70, unit: 'g HC por 100g', absorption: 'rapida', category: 'Cereales' },
+    { id: 225, name: 'Pan Tostado / Biscotes', carbs: 75, unit: 'g HC por 100g', absorption: 'media', category: 'Cereales' },
+    { id: 226, name: 'Tortitas Maíz/Arroz', carbs: 80, unit: 'g HC por 100g', absorption: 'rapida', category: 'Cereales' },
     { id: 208, name: 'Patata (Cocida)', carbs: 20, unit: 'g HC por 100g', absorption: 'rapida', category: 'Cereales' },
     { id: 209, name: 'Patata (Frita)', carbs: 35, unit: 'g HC por 100g', absorption: 'lenta', fatProteinAlert: true, category: 'Cereales' }, // Grasa retrasa absorción
     { id: 210, name: 'Pizza (Masa fina)', carbs: 30, unit: 'g HC por 100g', absorption: 'lenta', fatProteinAlert: true, category: 'Cereales' },

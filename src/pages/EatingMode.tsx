@@ -430,7 +430,7 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                 <motion.div
                     key="savedMenus"
                     initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
-                    className="bg-white rounded-3xl shadow-xl p-6 min-h-[50vh]"
+                    className="bg-white rounded-3xl shadow-xl p-6 min-h-[50vh] max-h-[80vh] overflow-y-auto"
                 >
                     <div className="flex items-center mb-6">
                         <button onClick={() => setView('calculator')} className="mr-4 p-2 rounded-full hover:bg-slate-100 transition"><ChevronLeft className="h-6 w-6 text-slate-500" /></button>
@@ -475,7 +475,7 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                 <motion.div
                     key="foodList"
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
-                    className="bg-white rounded-3xl shadow-xl p-6 h-[80vh] flex flex-col"
+                    className="bg-white rounded-3xl shadow-xl p-6 h-[80vh] max-h-[800px] flex flex-col"
                 >
                     <div className="relative mb-4 flex items-center gap-3">
                         <button onClick={() => setView('calculator')} className="p-2 rounded-full hover:bg-slate-100 transition"><ChevronLeft className="h-6 w-6 text-slate-500" /></button>
