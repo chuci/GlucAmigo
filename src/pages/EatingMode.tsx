@@ -102,12 +102,31 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
 
     const addFoodToMeal = () => {
         if (!selectedFood || !foodQuantity) return;
-        const calculatedCarbs = (selectedFood.carbs * parseFloat(foodQuantity)) / 100;
+
+        let calculatedCarbs = 0;
+        let quantityInGrams = 0;
+
+        if (profile.useRations) {
+            // Input is in Rations (e.g. 1.5 R)
+            // 1 Ration = 10g Carbs
+            const rationsInput = parseFloat(foodQuantity);
+            calculatedCarbs = rationsInput * 10;
+
+            // Calculate how many grams of food correspond to these rations
+            // (TargetCarbs / CarbsPer100g) * 100
+            if (selectedFood.carbs > 0) {
+                quantityInGrams = (calculatedCarbs / selectedFood.carbs) * 100;
+            }
+        } else {
+            // Input is in Grams of Weight
+            quantityInGrams = parseFloat(foodQuantity);
+            calculatedCarbs = (selectedFood.carbs * quantityInGrams) / 100;
+        }
 
         const newItem = {
             id: Date.now(),
             name: selectedFood.name,
-            quantity: parseFloat(foodQuantity),
+            quantity: Math.round(quantityInGrams), // Store weight for consistency
             calculatedCarbs: calculatedCarbs,
             absorption: selectedFood.absorption,
             fatProteinAlert: selectedFood.fatProteinAlert
@@ -253,7 +272,12 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                                     <div className="space-y-2 mb-4">
                                         {addedFoods.map(item => (
                                             <div key={item.id} className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                                                <span className="text-slate-700 font-medium">{item.name} <span className="text-slate-400 text-xs font-normal">({item.quantity}g)</span></span>
+                                                <span className="text-slate-700 font-medium">
+                                                    {item.name}
+                                                    <span className="text-slate-400 text-xs font-normal ml-1">
+                                                        ({profile.useRations ? `${(item.calculatedCarbs / 10).toFixed(1)} R` : `${item.quantity}g`})
+                                                    </span>
+                                                </span>
                                                 <button onClick={() => removeFoodItem(item.id)}><Trash2 className="h-4 w-4 text-slate-300 hover:text-red-500" /></button>
                                             </div>
                                         ))}
@@ -515,8 +539,8 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                                 className="bg-white border-t border-slate-100 pt-4 mt-auto flex gap-3"
                             >
                                 <div className="relative flex-grow">
-                                    <input type="number" placeholder="0" className="w-full p-4 rounded-2xl bg-indigo-50 border-2 border-indigo-100 text-2xl font-black text-indigo-900 focus:outline-none focus:border-indigo-400 text-center" value={foodQuantity} onChange={(e) => setFoodQuantity(e.target.value)} />
-                                    <span className="absolute right-4 top-5 text-indigo-300 font-bold text-xs uppercase">Gramos</span>
+                                    <input autoFocus type="number" step={profile.useRations ? "0.5" : "1"} placeholder="0" className="w-full p-4 rounded-2xl bg-indigo-50 border-2 border-indigo-100 text-2xl font-black text-indigo-900 focus:outline-none focus:border-indigo-400 text-center" value={foodQuantity} onChange={(e) => setFoodQuantity(e.target.value)} />
+                                    <span className="absolute right-4 top-5 text-indigo-300 font-bold text-xs uppercase">{profile.useRations ? "Raciones" : "Gramos"}</span>
                                 </div>
                                 <button onClick={addFoodToMeal} disabled={!foodQuantity} className="bg-indigo-600 text-white px-6 rounded-2xl font-bold flex items-center shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition disabled:opacity-50 disabled:shadow-none">
                                     <PlusCircle className="h-8 w-8" />
