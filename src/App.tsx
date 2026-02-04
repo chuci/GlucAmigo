@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from
 import { AnimatePresence, motion } from 'framer-motion';
 import { Heart, Home, AlertTriangle, Settings } from 'lucide-react';
 import { useProfile, useDisclaimer } from './services/storage';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Pages
 import { HomeMode } from './pages/HomeMode';
