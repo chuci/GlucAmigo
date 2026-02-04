@@ -53,7 +53,8 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
         if (isNaN(currentGlucose) && isNaN(currentInput)) return null;
 
         const currentProfile = profile.ratios[selectedMealTime];
-        const gramsOfCarbs = currentInput;
+        // If in Rations mode, convert input to grams (1R = 10g)
+        const gramsOfCarbs = profile.useRations ? (currentInput * 10) : currentInput;
 
         let trendAdjustment = 0;
         if (trend === 'rising') trendAdjustment = 25;
@@ -62,7 +63,7 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
         if (trend === 'rapidFalling') trendAdjustment = -50;
 
         const result = calculateBolus({
-            carbs: gramsOfCarbs,
+            carbs: gramsOfCarbs, // Always pass grams to calculator
             bg: isNaN(currentGlucose) ? 0 : currentGlucose,
             target: currentProfile.target,
             carbRatio: currentProfile.carbRatio,
@@ -80,7 +81,8 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
             foodDose: foodDose,
             correctionDose: correctionDose,
             isHypoRisk: !isNaN(currentGlucose) && currentGlucose < 70,
-            trendAdjustment: trendAdjustment
+            trendAdjustment: trendAdjustment,
+            gramsUsed: gramsOfCarbs // helper for display
         };
     };
 
@@ -113,8 +115,10 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
         const newFoods = [...addedFoods, newItem];
         setAddedFoods(newFoods);
 
+        // Sum total grams
         const totalGrams = newFoods.reduce((acc, curr) => acc + curr.calculatedCarbs, 0);
-        setCarbsInput(totalGrams.toFixed(0));
+        // Display in grams or rations
+        setCarbsInput(profile.useRations ? (totalGrams / 10).toFixed(1) : totalGrams.toFixed(0));
 
         setSelectedFood(null);
         setFoodQuantity('');
@@ -126,7 +130,7 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
         const newFoods = addedFoods.filter(item => item.id !== id);
         setAddedFoods(newFoods);
         const totalGrams = newFoods.reduce((acc, curr) => acc + curr.calculatedCarbs, 0);
-        setCarbsInput(totalGrams.toFixed(0));
+        setCarbsInput(profile.useRations ? (totalGrams / 10).toFixed(1) : totalGrams.toFixed(0));
     };
 
     const saveCurrentMenu = () => {
@@ -144,7 +148,7 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
     const loadMenu = (menu: any) => {
         setAddedFoods(menu.foods);
         const totalGrams = menu.foods.reduce((acc: number, curr: any) => acc + curr.calculatedCarbs, 0);
-        setCarbsInput(totalGrams.toFixed(0));
+        setCarbsInput(profile.useRations ? (totalGrams / 10).toFixed(1) : totalGrams.toFixed(0));
         setView('calculator');
     };
 
@@ -219,12 +223,12 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                         <div className="flex items-end gap-3 mb-2">
                             <div className="flex-grow">
                                 <InputField
-                                    label="Carbohidratos"
+                                    label={profile.useRations ? "Raciones (1R = 10g)" : "Carbohidratos"}
                                     icon={Apple}
                                     value={carbsInput}
                                     setValue={setCarbsInput}
                                     placeholder="0"
-                                    unit="g"
+                                    unit={profile.useRations ? "R" : "g"}
                                 />
                             </div>
                             <div className="flex flex-col gap-2 mb-4">
@@ -351,7 +355,9 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                                         <div>
                                             <div className="font-bold text-slate-700">1. Bolo Alimenticio (Ratios)</div>
                                             <div className="text-xs text-slate-500 font-mono mt-1">
-                                                <span className="bg-indigo-50 px-1 rounded text-indigo-600 font-bold">{carbsInput}g</span> ÷ Ratio {currentProfile.carbRatio}
+                                                <span className="bg-indigo-50 px-1 rounded text-indigo-600 font-bold">
+                                                    {carbsInput}{profile.useRations ? 'R' : 'g'}
+                                                </span> ÷ Ratio {currentProfile.carbRatio}
                                             </div>
                                         </div>
                                         <div className="font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">

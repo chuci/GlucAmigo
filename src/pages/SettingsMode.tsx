@@ -32,6 +32,7 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
     const [localProfile, setLocalProfile] = useState<{
         name: string;
         cloudConsent: boolean;
+        useRations: boolean;
         ratios: {
             [key: string]: {
                 carbRatio: string | number;
@@ -42,6 +43,7 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
     }>({
         name: profile.name,
         cloudConsent: profile.cloudConsent || false,
+        useRations: profile.useRations || false,
         ratios: {
             breakfast: { ...profile.ratios.breakfast },
             lunch: { ...profile.ratios.lunch },
@@ -67,7 +69,8 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
             name: localProfile.name,
             ratios: cleanRatios,
             isConfigured: true,
-            cloudConsent: localProfile.cloudConsent
+            cloudConsent: localProfile.cloudConsent,
+            useRations: localProfile.useRations
         };
 
         setProfile(newProfile);
@@ -90,6 +93,10 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
         }));
     };
 
+    const toggleRations = () => {
+        setLocalProfile(prev => ({ ...prev, useRations: !prev.useRations }));
+    };
+
     const definitions: any = {
         ratio: { title: "Ratio (I:CH)", text: "Son los gramos de hidratos de carbono que cubre 1 unidad de insulina.\n\nEjemplo: Ratio 10 significa que necesitas 1u de insulina por cada 10g de hidratos que comas.\n\nNúmero más BAJO = Necesitas MÁS insulina (eres más resistente).\nNúmero más ALTO = Necesitas MENOS insulina." },
         sensitivity: { title: "Sensibilidad (FSI)", text: "Es la cantidad de glucosa (mg/dL) que baja 1 unidad de insulina.\n\nEjemplo: 50 significa que 1u te baja 50 mg/dL.\n\nSe usa para calcular la dosis de corrección cuando estás alto." },
@@ -109,8 +116,13 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
                 <InputField label="Nombre" icon={Heart} type="text" value={localProfile.name} setValue={(val) => setLocalProfile(prev => ({ ...prev, name: val }))} placeholder="Nombre" unit="" />
 
                 <div className="flex items-center justify-between bg-slate-100 p-3 rounded-xl border border-slate-200 mb-6">
-                    <div className="flex flex-col"><span className="font-bold text-slate-700 text-sm">Usar Raciones (1R = 10g)</span></div>
-                    <button type="button" className="text-indigo-600 focus:outline-none"><ToggleLeft className="h-10 w-10 text-slate-400" /></button>
+                    <div className="flex flex-col">
+                        <span className="font-bold text-slate-700 text-sm">Usar Raciones (1R = 10g)</span>
+                        <span className="text-xs text-slate-400">{localProfile.useRations ? 'Activado' : 'Desactivado (Usar gramos)'}</span>
+                    </div>
+                    <button type="button" onClick={toggleRations} className={`focus:outline-none transition-colors ${localProfile.useRations ? 'text-indigo-600' : 'text-slate-400'}`}>
+                        <ToggleLeft className={`h-10 w-10 transition-transform ${localProfile.useRations ? 'rotate-180' : ''}`} />
+                    </button>
                 </div>
 
                 {(['breakfast', 'lunch', 'snack', 'dinner'] as const).map((meal) => (

@@ -4,6 +4,7 @@ export interface UserProfile {
     name: string;
     weight?: number;
     cloudConsent?: boolean; // New consent flag
+    useRations?: boolean; // Toggle between Grams (false) and Rations (true)
     ratios: {
         breakfast: { carbRatio: number; sensitivity: number; target: number };
         lunch: { carbRatio: number; sensitivity: number; target: number };
@@ -18,6 +19,7 @@ export const useProfile = () => {
             name: 'Campeona',
             isConfigured: false,
             cloudConsent: false, // Default to false for privacy
+            useRations: false, // Default: Grams
             ratios: {
                 breakfast: { carbRatio: 10, sensitivity: 50, target: 100 },
                 lunch: { carbRatio: 12, sensitivity: 50, target: 100 },
