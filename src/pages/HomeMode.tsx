@@ -56,6 +56,8 @@ export const HomeMode: React.FC = () => {
             className="space-y-6 mt-4"
         >
             {/* Quick Stats Widget (Real Data) */}
+            {/* Quick Stats Widget (Hidden by user request) */}
+            {/* 
             <motion.div variants={item} className="grid grid-cols-2 gap-4 mb-6">
                 <div className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center text-center">
                     <div className="bg-indigo-50 p-2 rounded-full mb-2">
@@ -72,6 +74,7 @@ export const HomeMode: React.FC = () => {
                     <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">IOB Activa</span>
                 </div>
             </motion.div>
+            */}
 
             <motion.div variants={item} className="text-left mb-6 px-2">
                 <h2 className="text-lg font-bold text-slate-800">¿Qué necesitas ahora?</h2>
