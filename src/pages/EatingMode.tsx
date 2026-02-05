@@ -292,9 +292,9 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                                         </div>
                                     )}
                                     <div className="pt-3 border-t border-slate-200">
-                                        <div className="flex gap-2">
-                                            <input type="text" placeholder="Nombre del menú..." className="flex-grow text-xs p-3 rounded-xl border border-slate-200 bg-white" value={newMenuName} onChange={(e) => setNewMenuName(e.target.value)} />
-                                            <button onClick={saveCurrentMenu} className="bg-slate-800 text-white px-4 rounded-xl text-xs font-bold flex items-center hover:bg-slate-700 transition"><Save className="h-4 w-4 mr-1" /> Guardar</button>
+                                        <div className="flex gap-2 flex-wrap sm:flex-nowrap">
+                                            <input type="text" placeholder="Nombre del menú..." className="flex-grow text-sm p-3 rounded-xl border border-slate-200 bg-white min-w-[150px]" value={newMenuName} onChange={(e) => setNewMenuName(e.target.value)} />
+                                            <button onClick={saveCurrentMenu} className="flex-grow sm:flex-grow-0 bg-slate-800 text-white px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-center hover:bg-slate-700 transition whitespace-nowrap"><Save className="h-4 w-4 mr-1" /> GUARDAR</button>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -536,14 +536,14 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                         {selectedFood && (
                             <motion.div
                                 initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }}
-                                className="bg-white border-t border-slate-100 pt-4 mt-auto flex gap-3"
+                                className="bg-white border-t border-slate-100 pt-4 mt-auto flex flex-col gap-3"
                             >
-                                <div className="relative flex-grow">
+                                <div className="relative w-full">
                                     <input autoFocus type="number" step={profile.useRations ? "0.5" : "1"} placeholder="0" className="w-full p-4 rounded-2xl bg-indigo-50 border-2 border-indigo-100 text-2xl font-black text-indigo-900 focus:outline-none focus:border-indigo-400 text-center" value={foodQuantity} onChange={(e) => setFoodQuantity(e.target.value)} />
                                     <span className="absolute right-4 top-5 text-indigo-300 font-bold text-xs uppercase">{profile.useRations ? "Raciones" : "Gramos"}</span>
                                 </div>
-                                <button onClick={addFoodToMeal} disabled={!foodQuantity} className="bg-indigo-600 text-white px-6 rounded-2xl font-bold flex items-center shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition disabled:opacity-50 disabled:shadow-none">
-                                    <PlusCircle className="h-8 w-8" />
+                                <button onClick={addFoodToMeal} disabled={!foodQuantity} className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold flex justify-center items-center shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition disabled:opacity-50 disabled:shadow-none">
+                                    <PlusCircle className="h-6 w-6 mr-2" /> AÑADIR AL PLATO
                                 </button>
                             </motion.div>
                         )}
