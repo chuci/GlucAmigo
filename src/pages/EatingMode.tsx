@@ -312,11 +312,11 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                                     <GraduationCap className="h-6 w-6 text-indigo-500 mr-2" />
                                     <h3 className="font-bold text-slate-700">¿Cuánta rápida (Humalog) crees que necesitas?</h3>
                                 </div>
-                                <div className="flex gap-3">
+                                <div className="flex flex-col gap-3">
                                     <input
                                         type="number" step="0.5"
                                         placeholder="Tu apuesta..."
-                                        className="flex-grow p-4 bg-indigo-50 rounded-2xl border-2 border-indigo-100 text-xl font-bold text-indigo-900 text-center focus:outline-none focus:border-indigo-400 transition placeholder:text-indigo-200"
+                                        className="w-full p-4 bg-indigo-50 rounded-2xl border-2 border-indigo-100 text-xl font-bold text-indigo-900 text-center focus:outline-none focus:border-indigo-400 transition placeholder:text-indigo-200"
                                         value={proposedDose}
                                         onChange={(e) => setProposedDose(e.target.value)}
                                         onFocus={() => setShowResult(false)}
@@ -324,7 +324,7 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                                     <button
                                         onClick={checkResult}
                                         disabled={!proposedDose}
-                                        className="bg-indigo-600 text-white px-6 rounded-2xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition disabled:opacity-50 disabled:shadow-none"
+                                        className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition disabled:opacity-50 disabled:shadow-none uppercase tracking-wide"
                                     >
                                         Comprobar
                                     </button>
