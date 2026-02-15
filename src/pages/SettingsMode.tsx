@@ -7,15 +7,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import { useNavigate, useLocation } from 'react-router-dom';
 
-interface SettingsModeProps {
-    onBack: () => void;
-}
-
-export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
+export const SettingsMode: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    // Check if we have history state to go back to, otherwise default to home (handled by onBack if passed, or explicit nav)
-    const from = (location.state as any)?.from || '/';
 
     const handleBack = () => {
         // Prioritize returning to the specific route we came from
@@ -120,9 +114,11 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="bg-white rounded-2xl shadow-md p-6 pt-8 pb-20 relative">
             <div className="flex items-center mb-4">
-                <button onClick={handleBack} className="mr-3 p-1 rounded-full hover:bg-slate-100">
-                    <ChevronLeft className="h-6 w-6 text-slate-500" />
-                </button>
+                {profile.isConfigured && (
+                    <button onClick={handleBack} className="mr-3 p-1 rounded-full hover:bg-slate-100">
+                        <ChevronLeft className="h-6 w-6 text-slate-500" />
+                    </button>
+                )}
                 <h2 className="text-lg font-bold text-slate-800">Configuración</h2>
             </div>
 

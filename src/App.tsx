@@ -159,8 +159,7 @@ const AnimatedRoutes = () => {
                 } />
                 <Route path="/settings" element={
                     <PageTransition>
-                        {/* We pass a dummy onBack because now SettingsMode handles navigation with useLocation hook internally */}
-                        <SettingsMode onBack={() => { }} />
+                        <SettingsMode />
                     </PageTransition>
                 } />
             </Routes>
