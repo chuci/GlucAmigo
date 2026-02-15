@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useProfile, useSavedMenus, useFoodDatabase, useLogs } from '../services/storage';
 import { saveLogToCloud } from '../services/firebase';
 import { calculateBolus } from '../logic/bolus';
+import { fetchLatestGlucose, uploadTreatment } from '../services/nightscout';
 import { FOOD_DATABASE } from '../data/foodDatabase';
 import { InputField } from '../components/InputField';
 import { TrendButton } from '../components/TrendButton';
@@ -43,7 +44,29 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
         else if (hour >= 12 && hour < 16) setSelectedMealTime('lunch');
         else if (hour >= 16 && hour < 20) setSelectedMealTime('snack');
         else setSelectedMealTime('dinner');
-    }, []);
+
+        // 🚀 Nightscout: Fetch latest glucose if enabled
+        if (profile.nightscout?.enabled && profile.nightscout?.url) {
+            fetchLatestGlucose(profile.nightscout.url).then(data => {
+                if (data) {
+                    setGlucose(data.sgv.toString());
+                    // Trend mapping
+                    const trendMap: any = {
+                        'DoubleDown': 'rapidFalling',
+                        'SingleDown': 'falling',
+                        'FortyFiveDown': 'falling',
+                        'Flat': 'flat',
+                        'FortyFiveUp': 'rising',
+                        'SingleUp': 'rising',
+                        'DoubleUp': 'rapidRising'
+                    };
+                    if (data.direction && trendMap[data.direction]) {
+                        setTrend(trendMap[data.direction]);
+                    }
+                }
+            });
+        }
+    }, [profile.nightscout]);
 
     // --- Logic ---
     const calculateInsulin = () => {
@@ -432,10 +455,19 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                                             // ☁️ Sync to Firebase ONLY if consent is given
                                             if (profile.cloudConsent) {
                                                 saveLogToCloud(newLog);
-                                                alert('¡Guardado en historial y nube!');
-                                            } else {
-                                                alert('¡Guardado en historial local!');
                                             }
+
+                                            // 🚀 Nightscout: Upload treatment if enabled
+                                            if (profile.nightscout?.enabled && profile.nightscout?.uploadTreatments && profile.nightscout?.secret) {
+                                                uploadTreatment(profile.nightscout.url, profile.nightscout.secret, {
+                                                    carbs: newLog.carbs,
+                                                    insulin: newLog.insulin.total,
+                                                    notes: `GlucAmigo: ${newLog.foods.join(', ')}`,
+                                                    eventTime: newLog.timestamp
+                                                }).catch(err => alert('Error al subir a Nightscout: ' + err.message));
+                                            }
+
+                                            alert('¡Registro guardado!');
 
                                             setShowResult(false);
                                             setAddedFoods([]);

@@ -34,6 +34,12 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
         name: string;
         cloudConsent: boolean;
         useRations: boolean;
+        nightscout: {
+            enabled: boolean;
+            url: string;
+            secret: string;
+            uploadTreatments: boolean;
+        };
         ratios: {
             [key: string]: {
                 carbRatio: string | number;
@@ -45,6 +51,12 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
         name: profile.name,
         cloudConsent: profile.cloudConsent || false,
         useRations: profile.useRations || false,
+        nightscout: {
+            enabled: profile.nightscout?.enabled || false,
+            url: profile.nightscout?.url || '',
+            secret: profile.nightscout?.secret || '',
+            uploadTreatments: profile.nightscout?.uploadTreatments || false,
+        },
         ratios: {
             breakfast: { ...profile.ratios.breakfast },
             lunch: { ...profile.ratios.lunch },
@@ -71,7 +83,8 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
             ratios: cleanRatios,
             isConfigured: true,
             cloudConsent: localProfile.cloudConsent,
-            useRations: localProfile.useRations
+            useRations: localProfile.useRations,
+            nightscout: { ...localProfile.nightscout }
         };
 
         setProfile(newProfile);
@@ -116,7 +129,7 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
             <form onSubmit={handleSave}>
                 <InputField label="Nombre" icon={Heart} type="text" value={localProfile.name} setValue={(val) => setLocalProfile(prev => ({ ...prev, name: val }))} placeholder="Nombre" unit="" />
 
-                <div className="flex items-center justify-between bg-slate-100 p-3 rounded-xl border border-slate-200 mb-6">
+                <div className="flex items-center justify-between bg-slate-100 p-3 rounded-xl border border-slate-200 mb-4">
                     <div className="flex flex-col">
                         <span className="font-bold text-slate-700 text-sm">Usar Raciones (1R = 10g)</span>
                         <span className="text-xs text-slate-400">{localProfile.useRations ? 'Activado' : 'Desactivado (Usar gramos)'}</span>
@@ -124,6 +137,63 @@ export const SettingsMode: React.FC<SettingsModeProps> = ({ onBack }) => {
                     <button type="button" onClick={toggleRations} className={`focus:outline-none transition-colors ${localProfile.useRations ? 'text-indigo-600' : 'text-slate-400'}`}>
                         <ToggleLeft className={`h-10 w-10 transition-transform ${localProfile.useRations ? 'rotate-180' : ''}`} />
                     </button>
+                </div>
+
+                {/* Nightscout Section */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex flex-col">
+                            <span className="font-bold text-slate-800 text-sm">Integración Nightscout</span>
+                            <span className="text-[10px] text-slate-400 uppercase font-black">Carga de glucosa automática</span>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setLocalProfile(p => ({ ...p, nightscout: { ...p.nightscout, enabled: !p.nightscout.enabled } }))}
+                            className={`focus:outline-none transition-colors ${localProfile.nightscout.enabled ? 'text-green-600' : 'text-slate-400'}`}
+                        >
+                            <ToggleLeft className={`h-10 w-10 transition-transform ${localProfile.nightscout.enabled ? 'rotate-180' : ''}`} />
+                        </button>
+                    </div>
+
+                    <AnimatePresence>
+                        {localProfile.nightscout.enabled && (
+                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="space-y-4 overflow-hidden">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] uppercase font-bold text-slate-400 ml-1">URL de Nightscout</label>
+                                    <input
+                                        type="url"
+                                        placeholder="https://tu-app.herokuapp.com"
+                                        className="w-full p-3 rounded-xl border bg-white focus:ring-2 focus:ring-indigo-200 outline-none text-sm"
+                                        value={localProfile.nightscout.url}
+                                        onChange={(e) => setLocalProfile(p => ({ ...p, nightscout: { ...p.nightscout, url: e.target.value } }))}
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] uppercase font-bold text-slate-400 ml-1">API Secret (para subir datos)</label>
+                                    <input
+                                        type="password"
+                                        placeholder="Tu password de Nightscout"
+                                        className="w-full p-3 rounded-xl border bg-white focus:ring-2 focus:ring-indigo-200 outline-none text-sm"
+                                        value={localProfile.nightscout.secret}
+                                        onChange={(e) => setLocalProfile(p => ({ ...p, nightscout: { ...p.nightscout, secret: e.target.value } }))}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between p-1">
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-slate-700 text-xs">Subir Insulina a Nightscout</span>
+                                        <span className="text-[10px] text-slate-400">Registrar bolus automáticamente</span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setLocalProfile(p => ({ ...p, nightscout: { ...p.nightscout, uploadTreatments: !p.nightscout.uploadTreatments } }))}
+                                        className={`focus:outline-none transition-colors ${localProfile.nightscout.uploadTreatments ? 'text-indigo-600' : 'text-slate-400'}`}
+                                    >
+                                        <ToggleLeft className={`h-8 w-8 transition-transform ${localProfile.nightscout.uploadTreatments ? 'rotate-180' : ''}`} />
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {(['breakfast', 'lunch', 'snack', 'dinner'] as const).map((meal) => (

@@ -5,6 +5,12 @@ export interface UserProfile {
     weight?: number;
     cloudConsent?: boolean; // New consent flag
     useRations?: boolean; // Toggle between Grams (false) and Rations (true)
+    nightscout?: {
+        enabled: boolean;
+        url: string;
+        secret: string;
+        uploadTreatments: boolean;
+    };
     ratios: {
         breakfast: { carbRatio: number; sensitivity: number; target: number };
         lunch: { carbRatio: number; sensitivity: number; target: number };
@@ -12,7 +18,25 @@ export interface UserProfile {
         dinner: { carbRatio: number; sensitivity: number; target: number };
     };
 }
-// ... existing code ...
+export interface SavedMenu {
+    id: number;
+    name: string;
+    foods: any[];
+}
+
+export interface LogEntry {
+    id: number;
+    timestamp: string;
+    glucose: number;
+    carbs: number;
+    foods: string[];
+    insulin: {
+        total: number;
+        food: number;
+        correction: number;
+    };
+    notes?: string;
+}
 export const useProfile = () => {
     return useLocalStorageState<UserProfile & { isConfigured?: boolean }>('diabuddy-profile-v3', {
         defaultValue: {
@@ -20,6 +44,12 @@ export const useProfile = () => {
             isConfigured: false,
             cloudConsent: false, // Default to false for privacy
             useRations: false, // Default: Grams
+            nightscout: {
+                enabled: false,
+                url: '',
+                secret: '',
+                uploadTreatments: false
+            },
             ratios: {
                 breakfast: { carbRatio: 10, sensitivity: 50, target: 100 },
                 lunch: { carbRatio: 12, sensitivity: 50, target: 100 },
