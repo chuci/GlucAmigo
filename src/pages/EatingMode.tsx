@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Apple, Activity, AlertTriangle, Save, ChevronLeft, Search, Utensils, PlusCircle, Trash2, TrendingUp, TrendingDown, ArrowRight, Sun, Moon, Coffee, Star, BookOpen, GraduationCap, CheckCircle, XCircle, Calculator, ChevronsUp, ChevronsDown } from 'lucide-react';
+import { Settings, Apple, Activity, AlertTriangle, Save, ChevronLeft, Search, Utensils, PlusCircle, Trash2, TrendingUp, TrendingDown, ArrowRight, Sun, Moon, Coffee, Star, BookOpen, GraduationCap, CheckCircle, Calculator, ChevronsUp, ChevronsDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useProfile, useSavedMenus, useFoodDatabase, useLogs } from '../services/storage';
+import { useProfile, useSavedMenus, useLogs } from '../services/storage';
 import { saveLogToCloud } from '../services/firebase';
 import { calculateBolus } from '../logic/bolus';
 import { fetchLatestGlucose, uploadTreatment } from '../services/nightscout';
@@ -14,13 +14,14 @@ interface EatingModeProps {
     onSettings: () => void;
 }
 
-export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) => {
+export const EatingMode: React.FC<EatingModeProps> = ({ onSettings }) => {
     // State
     const [view, setView] = useState<'calculator' | 'foodList' | 'savedMenus'>('calculator');
     const [glucose, setGlucose] = useState('');
     const [trend, setTrend] = useState('flat');
     const [carbsInput, setCarbsInput] = useState('');
     const [selectedMealTime, setSelectedMealTime] = useState<'breakfast' | 'lunch' | 'snack' | 'dinner'>('lunch');
+    const [nsStatus, setNsStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
     // Educational State
     const [proposedDose, setProposedDose] = useState('');
@@ -47,9 +48,11 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
 
         // 🚀 Nightscout: Fetch latest glucose if enabled
         if (profile.nightscout?.enabled && profile.nightscout?.url) {
+            setNsStatus('loading');
             fetchLatestGlucose(profile.nightscout.url).then(data => {
                 if (data) {
                     setGlucose(data.sgv.toString());
+                    setNsStatus('success');
                     // Trend mapping
                     const trendMap: any = {
                         'DoubleDown': 'rapidFalling',
@@ -63,8 +66,10 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                     if (data.direction && trendMap[data.direction]) {
                         setTrend(trendMap[data.direction]);
                     }
+                } else {
+                    setNsStatus('error');
                 }
-            });
+            }).catch(() => setNsStatus('error'));
         }
     }, [profile.nightscout]);
 
@@ -251,7 +256,16 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onBack, onSettings }) =>
                     <div className="bg-white rounded-3xl shadow-xl shadow-indigo-100/50 p-6 border border-slate-50">
                         {/* Glucosa */}
                         <div className="mb-6">
-                            <InputField label="Glucosa Actual" icon={Activity} value={glucose} setValue={setGlucose} placeholder="---" unit="mg/dL" />
+                            <div className="flex items-center justify-between mb-1 px-1">
+                                <label className="text-sm font-medium text-slate-600">Glucosa Actual</label>
+                                {profile.nightscout?.enabled && (
+                                    <div className="flex items-center gap-1.5 opacity-80">
+                                        <span className="text-[9px] font-black text-slate-400 border border-slate-200 px-1 rounded bg-slate-50 uppercase tracking-tighter">Nightscout</span>
+                                        <div className={`w-2 h-2 rounded-full ${nsStatus === 'success' ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.6)]' : nsStatus === 'error' ? 'bg-red-500' : 'bg-slate-300 animate-pulse'}`}></div>
+                                    </div>
+                                )}
+                            </div>
+                            <InputField label="" icon={Activity} value={glucose} setValue={setGlucose} placeholder="---" unit="mg/dL" />
                             <div className="flex gap-1 justify-between mt-3 px-1">
                                 <TrendButton type="rapidFalling" icon={ChevronsDown} active={trend === 'rapidFalling'} onClick={() => setTrend('rapidFalling')} colorClass="bg-red-500" />
                                 <TrendButton type="falling" icon={TrendingDown} active={trend === 'falling'} onClick={() => setTrend('falling')} colorClass="bg-orange-400 rotate-[-45deg]" />

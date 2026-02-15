@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Save, ChevronLeft, Heart, ToggleLeft, Info, X } from 'lucide-react';
 import { useProfile } from '../services/storage';
 import { saveProfileToCloud } from '../services/firebase';
+import { fetchLatestGlucose } from '../services/nightscout';
 import { InputField } from '../components/InputField';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,6 +23,7 @@ export const SettingsMode: React.FC = () => {
     };
     const [profile, setProfile] = useProfile();
     const [activeHelp, setActiveHelp] = useState<string | null>(null);
+    const [connStatus, setConnStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
     // Initial state allows string inputs for better UX
     const [localProfile, setLocalProfile] = useState<{
@@ -58,6 +60,17 @@ export const SettingsMode: React.FC = () => {
             dinner: { ...profile.ratios.dinner },
         }
     });
+
+    const checkNSConnection = async () => {
+        if (!localProfile.nightscout.url) return;
+        setConnStatus('loading');
+        try {
+            const data = await fetchLatestGlucose(localProfile.nightscout.url);
+            setConnStatus(data ? 'success' : 'error');
+        } catch (e) {
+            setConnStatus('error');
+        }
+    };
 
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
@@ -140,7 +153,17 @@ export const SettingsMode: React.FC = () => {
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex flex-col">
                             <span className="font-bold text-slate-800 text-sm">Integración Nightscout</span>
-                            <span className="text-[10px] text-slate-400 uppercase font-black">Carga de glucosa automática</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] text-slate-400 uppercase font-black">Carga de glucosa automática</span>
+                                {localProfile.nightscout.enabled && (
+                                    <div className="flex items-center gap-1 ml-2">
+                                        <div className={`w-2 h-2 rounded-full ${connStatus === 'success' ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.6)]' : connStatus === 'error' ? 'bg-red-500' : 'bg-slate-300'}`}></div>
+                                        <button type="button" onClick={checkNSConnection} className="text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-800 disabled:opacity-50" disabled={connStatus === 'loading'}>
+                                            {connStatus === 'loading' ? '...' : 'Probar'}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <button
                             type="button"
