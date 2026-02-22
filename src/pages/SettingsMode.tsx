@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Save, ChevronLeft, Heart, ToggleLeft, Info, X } from 'lucide-react';
 import { useProfile } from '../services/storage';
 import { saveProfileToCloud } from '../services/firebase';
-import { fetchLatestGlucose } from '../services/nightscout';
+import { fetchLatestGlucose, fetchNightscoutProfile } from '../services/nightscout';
 import { InputField } from '../components/InputField';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -69,6 +69,28 @@ export const SettingsMode: React.FC = () => {
             setConnStatus(data ? 'success' : 'error');
         } catch (e) {
             setConnStatus('error');
+        }
+    };
+
+    const syncProfiles = async () => {
+        if (!localProfile.nightscout.url) return;
+        setConnStatus('loading');
+        try {
+            const ratios = await fetchNightscoutProfile(localProfile.nightscout.url);
+            if (ratios) {
+                setLocalProfile(prev => ({
+                    ...prev,
+                    ratios: ratios
+                }));
+                setConnStatus('success');
+                alert('¡Ratios sincronizados desde Nightscout!');
+            } else {
+                setConnStatus('error');
+                alert('No se pudo obtener el perfil de Nightscout.');
+            }
+        } catch (e) {
+            setConnStatus('error');
+            alert('Error al sincronizar: ' + (e as Error).message);
         }
     };
 
@@ -160,6 +182,9 @@ export const SettingsMode: React.FC = () => {
                                         <div className={`w-2 h-2 rounded-full ${connStatus === 'success' ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.6)]' : connStatus === 'error' ? 'bg-red-500' : 'bg-slate-300'}`}></div>
                                         <button type="button" onClick={checkNSConnection} className="text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-800 disabled:opacity-50" disabled={connStatus === 'loading'}>
                                             {connStatus === 'loading' ? '...' : 'Probar'}
+                                        </button>
+                                        <button type="button" onClick={syncProfiles} className="text-[10px] font-black uppercase text-purple-600 hover:text-purple-800 disabled:opacity-50 border-l border-slate-200 pl-2" disabled={connStatus === 'loading'}>
+                                            Sincronizar Ratios
                                         </button>
                                     </div>
                                 )}
