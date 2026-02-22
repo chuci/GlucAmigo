@@ -114,4 +114,21 @@ export const FOOD_DATABASE: FoodItem[] = [
     // --- SALSAS ---
     { id: 950, name: 'Ketchup', carbs: 25, unit: 'g HC por 100g', absorption: 'rapida', category: 'Otros' },
     { id: 951, name: 'Mayonesa', carbs: 1, unit: 'g HC por 100g', absorption: 'lenta', fatProteinAlert: true, category: 'Otros' },
+
+    // --- SNACKS INFANTILES Y CHUCHES ---
+    { id: 1001, name: 'Flash (Polo de hielo)', carbs: 15, unit: 'g HC por 100ml', absorption: 'rapida', category: 'Otros' },
+    { id: 1002, name: 'Polo de Limón/Fresa', carbs: 20, unit: 'g HC por 100g', absorption: 'rapida', category: 'Otros' },
+    { id: 1003, name: 'Gusanitos (Maíz horneado)', carbs: 65, unit: 'g HC por 100g', absorption: 'rapida', category: 'Otros' },
+    { id: 1004, name: 'Pipas Saladas (con cáscara)', carbs: 3, unit: 'g HC por 100g', absorption: 'lenta', fatProteinAlert: true, category: 'Otros' },
+    { id: 1005, name: 'Gominolas / Chuches', carbs: 80, unit: 'g HC por 100g', absorption: 'rapida', category: 'Otros' },
+    { id: 1006, name: 'Piruleta', carbs: 95, unit: 'g HC por 100g', absorption: 'rapida', category: 'Otros' },
+    { id: 1007, name: 'Galletas de chocolate (Oreo/Rellenas)', carbs: 68, unit: 'g HC por 100g', absorption: 'media', category: 'Otros' },
+    { id: 1008, name: 'Bollycao / Pan de leche relleno', carbs: 48, unit: 'g HC por 100g', absorption: 'media', category: 'Otros' },
+    { id: 1009, name: 'Palomitas (Bolsa cine)', carbs: 60, unit: 'g HC por 100g', absorption: 'rapida', category: 'Otros' },
+    { id: 1010, name: 'Helado de cono (Tipo Cornetto)', carbs: 32, unit: 'g HC por 100g', absorption: 'lenta', fatProteinAlert: true, category: 'Otros' },
+    { id: 1011, name: 'Sobao Pasiego', carbs: 50, unit: 'g HC por 100g', absorption: 'rapida', fatProteinAlert: true, category: 'Otros' },
+    { id: 1012, name: 'Natillas', carbs: 18, unit: 'g HC por 100g', absorption: 'media', category: 'Lacteos' },
+    { id: 1013, name: 'Arroz con leche', carbs: 22, unit: 'g HC por 100g', absorption: 'media', category: 'Lacteos' },
+    { id: 1014, name: 'Nocilla / Nutella', carbs: 55, unit: 'g HC por 100g', absorption: 'lenta', fatProteinAlert: true, category: 'Otros' },
+    { id: 1015, name: 'Pan de leche / Brioche', carbs: 45, unit: 'g HC por 100g', absorption: 'rapida', category: 'Cereales' },
 ];
