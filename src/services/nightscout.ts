@@ -46,6 +46,7 @@ export async function fetchLatestGlucose(url: string, secret?: string): Promise<
 
         if (!response.ok) {
             console.warn(`❌ NS Fetch failed: ${response.status} ${response.statusText}`);
+            if (response.status === 401) console.error("🔑 Error de autorización (401): Revisa tu API Secret en Nightscout.");
             return null;
         }
 

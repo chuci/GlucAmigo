@@ -143,7 +143,11 @@ export const SettingsMode: React.FC = () => {
     const definitions: any = {
         ratio: { title: "Ratio (I:CH)", text: "Son los gramos de hidratos de carbono que cubre 1 unidad de insulina.\n\nEjemplo: Ratio 10 significa que necesitas 1u de insulina por cada 10g de hidratos que comas.\n\nNúmero más BAJO = Necesitas MÁS insulina (eres más resistente).\nNúmero más ALTO = Necesitas MENOS insulina." },
         sensitivity: { title: "Sensibilidad (FSI)", text: "Es la cantidad de glucosa (mg/dL) que baja 1 unidad de insulina.\n\nEjemplo: 50 significa que 1u te baja 50 mg/dL.\n\nSe usa para calcular la dosis de corrección cuando estás alto." },
-        target: { title: "Objetivo", text: "Es el valor de glucosa ideal al que quieres llegar después de la insulina activa (unas 3-4h).\n\nLo habitual es buscar 100-110 mg/dL." }
+        target: { title: "Objetivo", text: "Es el valor de glucosa ideal al que quieres llegar después de la insulina activa (unas 3-4h).\n\nLo habitual es buscar 100-110 mg/dL." },
+        nightscout: {
+            title: "Configurar Nightscout",
+            text: "Para que funcione en la web, DEBES habilitar CORS en tu Nightscout:\n\n1. Ve a los ajustes de tu servidor (Heroku/Vps).\n2. En variables de entorno, busca ENABLE y añade 'cors' (ej: 'careportal basal cors').\n3. Añade la variable CORS_ALLOW_ORIGIN con valor '*' (o el link de esta app).\n\nSin esto, el navegador bloqueará la conexión por seguridad."
+        }
     };
 
     return (
@@ -174,9 +178,11 @@ export const SettingsMode: React.FC = () => {
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-6">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex flex-col">
-                            <span className="font-bold text-slate-800 text-sm">Integración Nightscout</span>
                             <div className="flex items-center gap-2">
                                 <span className="text-[10px] text-slate-400 uppercase font-black">Carga de glucosa automática</span>
+                                <button type="button" onClick={() => setActiveHelp('nightscout')} className="text-indigo-400 hover:text-indigo-600 transition">
+                                    <Info className="h-3.5 w-3.5" />
+                                </button>
                                 {localProfile.nightscout.enabled && (
                                     <div className="flex items-center gap-1 ml-2">
                                         <div className={`w-2 h-2 rounded-full ${connStatus === 'success' ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.6)]' : connStatus === 'error' ? 'bg-red-500' : 'bg-slate-300'}`}></div>
