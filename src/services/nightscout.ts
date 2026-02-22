@@ -14,13 +14,38 @@ export interface NightscoutGlucose {
  */
 function normalizeUrl(url: string): string {
     if (!url) return '';
-    let normalized = url.trim().replace(/\/$/, '');
-    if (!normalized.startsWith('http')) {
-        normalized = `https://${normalized}`;
+    let normalized = url.trim();
+
+    // Remove protocol for a moment to clean the path
+    let protocol = 'https://';
+    if (normalized.startsWith('http://')) {
+        protocol = 'http://';
+        normalized = normalized.substring(7);
+    } else if (normalized.startsWith('https://')) {
+        protocol = 'https://';
+        normalized = normalized.substring(8);
     }
-    // Remove /api/v1 if the user accidentally included it
-    normalized = normalized.replace(/\/api\/v1$/, '');
-    return normalized;
+
+    // Remove any trailing slashes
+    normalized = normalized.replace(/\/$/, '');
+
+    // Aggressively remove /api/v1 if the user included it (even multiple times)
+    let changed = true;
+    while (changed) {
+        let before = normalized;
+        normalized = normalized.replace(/\/api\/v1$/, '');
+        normalized = normalized.replace(/\/api$/, ''); // Also remove trailing /api
+        if (before === normalized) changed = false;
+    }
+
+    const finalUrl = `${protocol}${normalized}`;
+
+    // Mixed Content Check: If app is https and NS is http, it will fail
+    if (window.location.protocol === 'https:' && protocol === 'http:') {
+        console.error("⚠️ MIXED CONTENT: No puedes conectar una instancia HTTP desde una app HTTPS. Usa HTTPS en tu Nightscout.");
+    }
+
+    return finalUrl;
 }
 
 /**

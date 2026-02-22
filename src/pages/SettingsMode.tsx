@@ -66,9 +66,19 @@ export const SettingsMode: React.FC = () => {
         setConnStatus('loading');
         try {
             const data = await fetchLatestGlucose(localProfile.nightscout.url, localProfile.nightscout.secret);
-            setConnStatus(data ? 'success' : 'error');
+            if (data) {
+                setConnStatus('success');
+            } else {
+                setConnStatus('error');
+                alert("❌ La conexión falló. Posibles causas:\n1. URL incorrecta.\n2. API Secret erróneo.\n3. CORS no habilitado en Nightscout.\n4. Estás usando HTTP en lugar de HTTPS.");
+            }
         } catch (e) {
             setConnStatus('error');
+            if (e instanceof TypeError && e.message === "Failed to fetch") {
+                alert("🛑 Bloqueo de Navegador (CORS/SSL):\nTu Nightscout está rechazando la conexión desde esta web.\n\nSOLUCIÓN:\n1. Habilita el plugin 'cors' en tu Nightscout.\n2. Pon CORS_ALLOW_ORIGIN='*'.\n3. Asegúrate de usar HTTPS.");
+            } else {
+                alert('Error al conectar: ' + (e as Error).message);
+            }
         }
     };
 
