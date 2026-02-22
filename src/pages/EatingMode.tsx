@@ -49,7 +49,7 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onSettings }) => {
         // 🚀 Nightscout: Fetch latest glucose if enabled
         if (profile.nightscout?.enabled && profile.nightscout?.url) {
             setNsStatus('loading');
-            fetchLatestGlucose(profile.nightscout.url).then(data => {
+            fetchLatestGlucose(profile.nightscout.url, profile.nightscout.secret).then(data => {
                 if (data) {
                     setGlucose(data.sgv.toString());
                     setNsStatus('success');
@@ -71,7 +71,7 @@ export const EatingMode: React.FC<EatingModeProps> = ({ onSettings }) => {
                 }
             }).catch(() => setNsStatus('error'));
         }
-    }, [profile.nightscout]);
+    }, [profile.nightscout?.enabled, profile.nightscout?.url, profile.nightscout?.secret]);
 
     // --- Logic ---
     const calculateInsulin = () => {

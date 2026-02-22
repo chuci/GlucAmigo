@@ -65,7 +65,7 @@ export const SettingsMode: React.FC = () => {
         if (!localProfile.nightscout.url) return;
         setConnStatus('loading');
         try {
-            const data = await fetchLatestGlucose(localProfile.nightscout.url);
+            const data = await fetchLatestGlucose(localProfile.nightscout.url, localProfile.nightscout.secret);
             setConnStatus(data ? 'success' : 'error');
         } catch (e) {
             setConnStatus('error');
@@ -76,7 +76,7 @@ export const SettingsMode: React.FC = () => {
         if (!localProfile.nightscout.url) return;
         setConnStatus('loading');
         try {
-            const ratios = await fetchNightscoutProfile(localProfile.nightscout.url);
+            const ratios = await fetchNightscoutProfile(localProfile.nightscout.url, localProfile.nightscout.secret);
             if (ratios) {
                 setLocalProfile(prev => ({
                     ...prev,

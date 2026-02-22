@@ -10,18 +10,44 @@ export interface NightscoutGlucose {
 }
 
 /**
+ * Helper to normalize Nightscout URL
+ */
+function normalizeUrl(url: string): string {
+    if (!url) return '';
+    let normalized = url.trim().replace(/\/$/, '');
+    if (!normalized.startsWith('http')) {
+        normalized = `https://${normalized}`;
+    }
+    // Remove /api/v1 if the user accidentally included it
+    normalized = normalized.replace(/\/api\/v1$/, '');
+    return normalized;
+}
+
+/**
  * Fetch the latest glucose entry from Nightscout
  */
-export async function fetchLatestGlucose(url: string): Promise<NightscoutGlucose | null> {
+export async function fetchLatestGlucose(url: string, secret?: string): Promise<NightscoutGlucose | null> {
     try {
         if (!url) return null;
 
-        // Ensure URL doesn't end with slash and has protocol
-        const baseUrl = url.replace(/\/$/, '');
+        const baseUrl = normalizeUrl(url);
         const apiUrl = `${baseUrl}/api/v1/entries/sgv.json?count=1`;
 
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error('Nightscout fetch failed');
+        console.log(`🚀 NS Fetching: ${apiUrl}`);
+
+        const headers: any = {
+            'Accept': 'application/json'
+        };
+        if (secret) {
+            headers['api-secret'] = secret;
+        }
+
+        const response = await fetch(apiUrl, { headers });
+
+        if (!response.ok) {
+            console.warn(`❌ NS Fetch failed: ${response.status} ${response.statusText}`);
+            return null;
+        }
 
         const data = await response.json();
         if (data && data.length > 0) {
@@ -33,7 +59,7 @@ export async function fetchLatestGlucose(url: string): Promise<NightscoutGlucose
         }
         return null;
     } catch (error) {
-        console.error('Error fetching from Nightscout:', error);
+        console.error('❌ Error fetching from Nightscout:', error);
         return null;
     }
 }
@@ -50,12 +76,8 @@ export async function uploadTreatment(url: string, secret: string, treatment: {
     try {
         if (!url || !secret) return;
 
-        const baseUrl = url.replace(/\/$/, '');
+        const baseUrl = normalizeUrl(url);
         const apiUrl = `${baseUrl}/api/v1/treatments`;
-
-        // Nightscout uses SHA1 of the API SECRET for authorization
-        // However, many modern Nightscout instances also accept the 'api-secret' header directly
-        // or require specific auth. We'll start with the most common 'api-secret' header.
 
         const body = {
             enteredBy: "GlucAmigo",
@@ -71,7 +93,7 @@ export async function uploadTreatment(url: string, secret: string, treatment: {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'api-secret': secret // This is the common way
+                'api-secret': secret
             },
             body: JSON.stringify(body)
         });
@@ -91,20 +113,32 @@ export async function uploadTreatment(url: string, secret: string, treatment: {
 /**
  * Fetch profiles from Nightscout and map them to GlucAmigo meal times
  */
-export async function fetchNightscoutProfile(url: string) {
+export async function fetchNightscoutProfile(url: string, secret?: string) {
     try {
         if (!url) return null;
-        const baseUrl = url.replace(/\/$/, '');
+        const baseUrl = normalizeUrl(url);
         const apiUrl = `${baseUrl}/api/v1/profile.json`;
 
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error('Nightscout profile fetch failed');
+        console.log(`🚀 NS Profile Fetching: ${apiUrl}`);
+
+        const headers: any = {
+            'Accept': 'application/json'
+        };
+        if (secret) {
+            headers['api-secret'] = secret;
+        }
+
+        const response = await fetch(apiUrl, { headers });
+        if (!response.ok) throw new Error(`Nightscout profile fetch failed: ${response.status}`);
 
         const profiles = await response.json();
         if (!profiles || profiles.length === 0) return null;
 
         // Get the latest profile (usually first in array)
-        const activeProfile = profiles[0].store[profiles[0].defaultProfile];
+        const profileData = profiles[0];
+        const activeProfileName = profileData.defaultProfile;
+        const activeProfile = profileData.store[activeProfileName];
+
         if (!activeProfile) return null;
 
         const getValueAtTime = (arr: any[], targetTimeStr: string) => {
@@ -145,7 +179,7 @@ export async function fetchNightscoutProfile(url: string) {
             result[meal] = {
                 carbRatio: getValueAtTime(activeProfile.carbratio, time),
                 sensitivity: getValueAtTime(activeProfile.isf, time),
-                target: getValueAtTime(activeProfile.target_low, time) // Use low target as default
+                target: getValueAtTime(activeProfile.target_low, time)
             };
         }
 
